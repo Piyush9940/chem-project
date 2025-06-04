@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Physical Chemistry Formula Sheet</title>
+  <style>
+    /* Dark colorful theme */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #e0e0e0;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+    }
+    h1 {
+      text-align: center;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffff;
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+    }
+    h2 {
+      margin-top: 25px;
+      color: #ffa500;
+      border-bottom: 2px solid #ffa500;
+      padding-bottom: 5px;
+      text-shadow: 0 0 5px #ffa500;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: rgba(255, 255, 255, 0.05);
+      margin: 10px 0;
+      padding: 12px;
+      border-left: 4px solid #00ffff;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0, 255, 255, 0.4);
+      transition: background 0.3s ease;
+    }
+    li:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    code {
+      font-family: Consolas, monospace;
+      color: #ff69b4;
+      font-size: 1rem;
+    }
+    a {
+      color: #00ffff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Physical Chemistry Formula Sheet</h1>
+
+    <h2>1. Thermodynamics</h2>
+    <ul>
+      <li><code>ΔU = q - w</code> (First Law of Thermodynamics)</li>
+      <li><code>w = -nRT ln(Vf/Vi)</code> (Work done by gas)</li>
+      <li><code>ΔH = ΔU + PΔV</code> (Enthalpy change)</li>
+      <li><code>ΔG = ΔH - TΔS</code> (Gibbs free energy)</li>
+      <li><code>ΔG = -RT ln K</code> (Relation with equilibrium)</li>
+      <li><code>Cv = (∂U/∂T)</code>, <code>Cp = (∂H/∂T)</code> (Heat capacities)</li>
+    </ul>
+
+    <h2>2. Chemical Kinetics</h2>
+    <ul>
+      <li><code>r = k[A]^m[B]^n</code> (Rate law)</li>
+      <li><code>k = Ae^(-Ea/RT)</code> (Arrhenius equation)</li>
+      <li><code>t₁/₂ = 0.693/k</code> (Half-life)</li>
+      <li><code>ln[A] = ln[A]₀ - kt</code> (First-order rate law)</li>
+    </ul>
+
+    <h2>3. Electrochemistry</h2>
+    <ul>
+      <li><code>E = E° - (RT/nF) ln Q</code> (Nernst equation)</li>
+      <li><code>ΔG = -nFE</code> (Gibbs energy and cell potential)</li>
+      <li><code>m = (Q/F)(M/n)</code> (Faraday's law)</li>
+    </ul>
+
+    <h2>4. Quantum Chemistry</h2>
+    <ul>
+      <li><code>Eₙ = -13.6/n² eV</code> (Hydrogen energy levels)</li>
+      <li><code>λ = h/mv</code> (de Broglie wavelength)</li>
+      <li><code>Δx·Δp ≥ h/4π</code> (Heisenberg's principle)</li>
+    </ul>
+
+    <h2>5. Equilibrium</h2>
+    <ul>
+      <li><code>Kc = [C]^c[D]^d / [A]^a[B]^b</code> (Equilibrium constant)</li>
+      <li><code>Kp = Kc(RT)^Δn</code> (Kp and Kc relation)</li>
+    </ul>
+
+    <h2>6. Colligative Properties</h2>
+    <ul>
+      <li><code>ΔP/P₀ = n₂/n₁</code> (Relative lowering of vapor pressure)</li>
+      <li><code>ΔTb = Kb·m</code> (Boiling point elevation)</li>
+      <li><code>ΔTf = Kf·m</code> (Freezing point depression)</li>
+      <li><code>Π = iCRT</code> (Osmotic pressure)</li>
+    </ul>
+
+    <h2>7. Gaseous State</h2>
+    <ul>
+      <li><code>PV = nRT</code> (Ideal gas law)</li>
+      <li><code>(P + a/V²)(V - b) = RT</code> (Van der Waals equation)</li>
+      <li><code>vrms = √(3RT/M)</code> (Root mean square velocity)</li>
+    </ul>
+
+    <h2>8. Solid State & Surface Chemistry</h2>
+    <ul>
+      <li><code>d = Z*M / (a³*N_A)</code> (Density of unit cell)</li>
+      <li><code>θ = (q_ads / q_max) = (KP / 1 + KP)</code> (Langmuir adsorption isotherm)</li>
+    </ul>
+
+    <h2>9. Spectroscopy & Quantum Concepts</h2>
+    <ul>
+      <li><code>E = hν</code> (Energy of photon)</li>
+      <li><code>ν = c/λ</code> (Wave relation)</li>
+    </ul>
+
+    <h2>10. Statistical Thermodynamics</h2>
+    <ul>
+      <li><code>S = k ln W</code> (Entropy and probability)</li>
+    </ul>
+
+    <p></p>
+  </div>
+</body>
+</html>

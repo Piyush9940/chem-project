@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Molar Mass Calculator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1f2937, #4b5563, #6b7280, #9ca3af);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      margin: 0; padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      color: #f9fafb;
+      padding: 20px;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .container {
+      background: rgba(31, 41, 55, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      text-align: center;
+      max-width: 900px;
+      width: 100%;
+    }
+    h1 {
+      color: #60a5fa;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    input[type="text"] {
+      padding: 12px;
+      font-size: 16px;
+      width: 100%;
+      border: 1px solid #4b5563;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      background-color: #374151;
+      color: #f9fafb;
+      box-sizing: border-box;
+    }
+    input::placeholder {
+      color: #9ca3af;
+    }
+    button {
+      padding: 12px 24px;
+      background: linear-gradient(90deg, #3b82f6, #6366f1);
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 5px;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+    button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(90deg, #2563eb, #4f46e5);
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #f9fafb;
+      min-height: 24px;
+      font-weight: 600;
+    }
+    #periodicTable {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(18, 1fr);
+      gap: 6px;
+      user-select: none;
+    }
+    .element {
+      padding: 8px 6px;
+      background: #374151;
+      border-radius: 6px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+    }
+    .element:hover {
+      background: #4b5563;
+    }
+    .element .symbol {
+      font-size: 18px;
+      font-weight: 700;
+      color: #bfdbfe;
+      line-height: 1;
+    }
+    .element .atomicNumber {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+    .element .mass {
+      font-size: 10px;
+      color: #d1d5db;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Molar Mass Calculator</h1>
+    <input type="text" id="formula" placeholder="Enter chemical formula (e.g., H2O, (NH4)2SO4·2H2O)" autocomplete="off" />
+    <div>
+      <button onclick="calculateMolarMass()">Calculate</button>
+      <button onclick="clearFormula()">Clear</button>
+    </div>
+    <p id="result"></p>
+    <div id="periodicTable" aria-label="Periodic Table"></div>
+  </div>
+
+  <script>
+    const atomicMasses = {
+      H: 1.008, He: 4.0026, Li: 6.94, Be: 9.0122, B: 10.81, C: 12.011, N: 14.007,
+      O: 15.999, F: 18.998, Ne: 20.180, Na: 22.990, Mg: 24.305, Al: 26.982,
+      Si: 28.085, P: 30.974, S: 32.06, Cl: 35.45, Ar: 39.948, K: 39.098, Ca: 40.078,
+      Sc: 44.956, Ti: 47.867, V: 50.942, Cr: 51.996, Mn: 54.938, Fe: 55.845,
+      Co: 58.933, Ni: 58.693, Cu: 63.546, Zn: 65.38, Ga: 69.723, Ge: 72.630,
+      As: 74.922, Se: 78.971, Br: 79.904, Kr: 83.798, Rb: 85.468, Sr: 87.62,
+      Y: 88.906, Zr: 91.224, Nb: 92.906, Mo: 95.95, Tc: 98.0, Ru: 101.07,
+      Rh: 102.91, Pd: 106.42, Ag: 107.87, Cd: 112.41, In: 114.82, Sn: 118.71,
+      Sb: 121.76, Te: 127.60, I: 126.90, Xe: 131.29, Cs: 132.91, Ba: 137.33,
+      La: 138.91, Ce: 140.12, Pr: 140.91, Nd: 144.24, Pm: 145.0, Sm: 150.36,
+      Eu: 151.96, Gd: 157.25, Tb: 158.93, Dy: 162.50, Ho: 164.93, Er: 167.26,
+      Tm: 168.93, Yb: 173.05, Lu: 174.97, Hf: 178.49, Ta: 180.95, W: 183.84,
+      Re: 186.21, Os: 190.23, Ir: 192.22, Pt: 195.08, Au: 196.97, Hg: 200.59,
+      Tl: 204.38, Pb: 207.2, Bi: 208.98, Po: 209.0, At: 210.0, Rn: 222.0,
+      Fr: 223.0, Ra: 226.0, Ac: 227.0, Th: 232.04, Pa: 231.04, U: 238.03,
+      Np: 237.0, Pu: 244.0, Am: 243.0, Cm: 247.0, Bk: 247.0, Cf: 251.0,
+      Es: 252.0, Fm: 257.0, Md: 258.0, No: 259.0, Lr: 262.0, Rf: 267.0,
+      Db: 270.0, Sg: 271.0, Bh: 270.0, Hs: 277.0, Mt: 278.0, Ds: 281.0,
+      Rg: 282.0, Cn: 285.0, Fl: 289.0, Lv: 293.0, Ts: 294.0, Og: 294.0
+    };
+
+    // Build periodic table grid order (optional: can be adjusted by group/period)
+    // For simplicity, we just add all elements in atomic number order:
+    const elementOrder = [
+      "H", "He",
+      "Li", "Be", "B", "C", "N", "O", "F", "Ne",
+      "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar",
+      "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr",
+      "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "In", "Sn", "Sb", "Te", "I", "Xe",
+      "Cs", "Ba", "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu",
+      "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Tl", "Pb", "Bi", "Po", "At", "Rn",
+      "Fr", "Ra", "Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr",
+      "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Fl", "Lv", "Ts", "Og"
+    ];
+
+    const periodicTable = document.getElementById('periodicTable');
+
+    function createPeriodicTable() {
+      elementOrder.forEach(sym => {
+        if (!(sym in atomicMasses)) return; // Skip unknown elements
+
+        const mass = atomicMasses[sym];
+        const el = document.createElement('div');
+        el.className = 'element';
+        el.title = `${sym} - Atomic Mass: ${mass.toFixed(3)} g/mol`;
+        el.innerHTML = `
+          <div class="atomicNumber">${getAtomicNumber(sym)}</div>
+          <div class="symbol">${sym}</div>
+          <div class="mass">${mass.toFixed(2)}</div>
+        `;
+        el.onclick = () => insertElement(sym);
+        periodicTable.appendChild(el);
+      });
+    }
+
+    // Atomic numbers map for display
+    function getAtomicNumber(symbol) {
+      return elementOrder.indexOf(symbol) + 1;
+    }
+
+    // Insert element symbol at cursor in input
+    function insertElement(symbol) {
+      const input = document.getElementById('formula');
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      const val = input.value;
+
+      input.value = val.substring(0, start) + symbol + val.substring(end);
+      input.selectionStart = input.selectionEnd = start + symbol.length;
+      input.focus();
+    }
+
+    // Clear input and result
+    function clearFormula() {
+      document.getElementById('formula').value = '';
+      document.getElementById('result').innerText = '';
+    }
+
+    // Parsing chemical formula supporting parentheses and dot notation (hydrates)
+    function calculateMolarMass() {
+      const formula = document.getElementById('formula').value.replace(/\s+/g, '');
+      if (!formula) {
+        document.getElementById('result').innerText = 'Please enter a formula.';
+        return;
+      }
+
+      try {
+        const mass = parseFormula(formula);
+        document.getElementById('result').innerText = `Molar Mass: ${mass.toFixed(4)} g/mol`;
+      } catch (err) {
+        document.getElementById('result').innerText = `Error: ${err.message}`;
+      }
+    }
+
+    // Function to parse formula with support for:
+    // - Element symbols with optional counts: e.g., H2, O
+    // - Parentheses with counts: e.g., (NH4)2
+    // - Dot notation for hydrates: e.g., CuSO4·5H2O
+    function parseFormula(formula) {
+      // Split by middle dot (· or .)
+      const parts = formula.split(/[\u00B7\.]/);
+      let totalMass = 0;
+      parts.forEach(part => {
+        totalMass += parseFormulaPart(part);
+      });
+      return totalMass;
+    }
+
+    function parseFormulaPart(formulaPart) {
+      let index = 0;
+
+      function parse() {
+        let mass = 0;
+        while (index < formulaPart.length) {
+          const char = formulaPart[index];
+
+          if (char === '(') {
+            index++;
+            const groupMass = parse(); // parse inside parentheses
+            if (formulaPart[index] !== ')') {
+              throw new Error("Missing closing parenthesis");
+            }
+            index++;
+
+            // Get multiplier after parenthesis
+            const count = parseCount();
+            mass += groupMass * count;
+          } else if (char === ')') {
+            // End of current group
+            break;
+          } else {
+            // Parse element and count
+            const element = parseElement();
+            if (!element) {
+              throw new Error(`Invalid element at position ${index + 1}`);
+            }
+            if (!(element in atomicMasses)) {
+              throw new Error(`Unknown element: ${element}`);
+            }
+            const count = parseCount();
+            mass += atomicMasses[element] * count;
+          }
+        }
+        return mass;
+      }
+
+      // Parse element symbol: Capital letter followed by optional lowercase letters
+      function parseElement() {
+        if (index >= formulaPart.length) return null;
+        let symbol = formulaPart[index];
+        if (!symbol.match(/[A-Z]/)) return null;
+        index++;
+        while (index < formulaPart.length && formulaPart[index].match(/[a-z]/)) {
+          symbol += formulaPart[index];
+          index++;
+        }
+        return symbol;
+      }
+
+      // Parse number (count), default to 1 if no digits
+      function parseCount() {
+        let countStr = '';
+        while (index < formulaPart.length && formulaPart[index].match(/\d/)) {
+          countStr += formulaPart[index];
+          index++;
+        }
+        return countStr ? parseInt(countStr) : 1;
+      }
+
+      return parse();
+    }
+
+    // Initialize periodic table on page load
+    createPeriodicTable();
+  </script>
+</body>
+</html>

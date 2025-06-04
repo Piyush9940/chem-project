@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Universal Chemical Equation Balancer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #2c3e50, #4ca1af);
+      color: #eee;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: #222;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #0ff;
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+    }
+    h1 {
+      color: #0ff;
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+    button {
+      background-color: #0ff;
+      color: #222;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #09c;
+      color: #fff;
+    }
+    #result {
+      margin-top: 20px;
+      text-align: left;
+      min-height: 2em;
+      word-wrap: break-word;
+    }
+    #wikiLink {
+      margin-top: 10px;
+    }
+    a {
+      color: #0ff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Chemical Equation Balancer</h1>
+    <input
+      type="text"
+      id="equationInput"
+      placeholder="Enter equation (e.g., H2 + O2 = H2O)"
+    />
+    <button onclick="balanceEquation()">Balance</button>
+    <div id="result">Enter an equation to get started.</div>
+    <div id="wikiLink"></div>
+  </div>
+
+  <script>
+    // Enhanced Fraction class for precise arithmetic
+    class Fraction {
+      constructor(numerator, denominator = 1) {
+        const gcd = (a, b) => b ? gcd(b, a % b) : a;
+        const g = gcd(Math.abs(numerator), Math.abs(denominator));
+        this.n = denominator < 0 ? -numerator / g : numerator / g;
+        this.d = Math.abs(denominator / g);
+      }
+      add(f) { return new Fraction(this.n * f.d + f.n * this.d, this.d * f.d); }
+      sub(f) { return new Fraction(this.n * f.d - f.n * this.d, this.d * f.d); }
+      mul(f) { return new Fraction(this.n * f.n, this.d * f.d); }
+      div(f) { return new Fraction(this.n * f.d, this.d * f.n); }
+      valueOf() { return this.n / this.d; }
+      toString() { return this.d === 1 ? `${this.n}` : `${this.n}/${this.d}`; }
+    }
+
+    // Improved formula parser to handle nested parentheses
+    function parseFormula(formula) {
+      const stack = [{}];
+      let i = 0;
+      while (i < formula.length) {
+        if (formula[i] === '(') {
+          stack.push({});
+          i++;
+        } else if (formula[i] === ')') {
+          const group = stack.pop();
+          i++;
+          let num = '';
+          while (i < formula.length && /\d/.test(formula[i])) {
+            num += formula[i++];
+          }
+          const multiplier = num ? parseInt(num) : 1;
+          for (const element in group) {
+            stack[stack.length - 1][element] = (stack[stack.length - 1][element] || 0) + group[element] * multiplier;
+          }
+        } else {
+          let element = formula[i++];
+          if (i < formula.length && /[a-z]/.test(formula[i])) {
+            element += formula[i++];
+          }
+          let num = '';
+          while (i < formula.length && /\d/.test(formula[i])) {
+            num += formula[i++];
+          }
+          const count = num ? parseInt(num) : 1;
+          stack[stack.length - 1][element] = (stack[stack.length - 1][element] || 0) + count;
+        }
+      }
+      return stack.pop();
+    }
+
+    // Build matrix for the system of equations
+    function buildMatrix(reactants, products) {
+      const allCompounds = reactants.concat(products);
+      const elementSet = new Set();
+      allCompounds.forEach(compound => {
+        const elements = Object.keys(parseFormula(compound));
+        elements.forEach(el => elementSet.add(el));
+      });
+      const elements = Array.from(elementSet);
+      const matrix = elements.map(el => {
+        return reactants.map(compound => new Fraction(parseFormula(compound)[el] || 0))
+          .concat(products.map(compound => new Fraction(-(parseFormula(compound)[el] || 0))));
+      });
+      return matrix;
+    }
+
+    // Solve matrix using Gaussian elimination
+    function solveMatrix(matrix) {
+      const rows = matrix.length;
+      const cols = matrix[0].length;
+      for (let r = 0; r < rows; r++) {
+        // Find pivot
+        let pivot = r;
+        while (pivot < rows && matrix[pivot][r].n === 0) {
+          pivot++;
+        }
+        if (pivot === rows) continue;
+        if (pivot !== r) {
+          [matrix[r], matrix[pivot]] = [matrix[pivot], matrix[r]];
+        }
+        const divisor = matrix[r][r];
+        matrix[r] = matrix[r].map(value => value.div(divisor));
+        for (let i = 0; i < rows; i++) {
+          if (i !== r) {
+            const factor = matrix[i][r];
+            matrix[i] = matrix[i].map((value, j) => value.sub(factor.mul(matrix[r][j])));
+          }
+        }
+      }
+      // Extract solution
+      const lcm = (a, b) => a * b / gcd(a, b);
+      const gcd = (a, b) => b ? gcd(b, a % b) : a;
+      let commonDenominator = 1;
+      matrix.forEach(row => {
+        row.forEach(value => {
+          commonDenominator = lcm(commonDenominator, value.d);
+        });
+      });
+      const coefficients = matrix[0].map((_, colIndex) => {
+        return matrix.reduce((sum, row) => sum + row[colIndex].valueOf(), 0);
+      });
+      const scaledCoefficients = coefficients.map(coef => Math.round(coef * commonDenominator));
+      const divisor = scaledCoefficients.reduce((a, b) => gcd(Math.abs(a), Math.abs(b)));
+      return scaledCoefficients.map(coef => coef / divisor);
+    }
+
+    // Main function to balance the equation
+    function balanceEquation() {
+      const input = document.getElementById("equationInput").value.trim();
+      const resultDiv = document.getElementById("result");
+      const wikiDiv = document.getElementById("wikiLink");
+
+      if (!input.includes("=")) {
+        resultDiv.textContent = "Please use '=' between reactants and products.";
+        wikiDiv.innerHTML = "";
+        return;
+      }
+
+      try {
+        const [left, right] = input.split("=").map(side => side.trim());
+        const reactants = left.split("+").map(compound => compound.trim());
+        const products = right.split("+").map(compound => compound.trim());
+
+        const matrix = buildMatrix(reactants, products);
+        const coefficients = solveMatrix(matrix);
+
+        if (!coefficients || coefficients.some(coef => isNaN(coef))) {
+          resultDiv.textContent = "Could not balance the equation.";
+          wikiDiv.innerHTML = "";
+          return;
+        }
+
+        const leftSide = reactants.map((compound, i) => `${coefficients[i]}${compound}`).join(" + ");
+        const rightSide = products.map((compound, i) => `${coefficients[i + reactants.length]}${compound}`).join(" + ");
+        resultDiv.innerHTML = `<strong>Balanced:</strong> ${leftSide} = ${rightSide}`;
+
+        const searchQuery = encodeURIComponent(input);
+        wikiDiv.innerHTML = `<p>Learn more: <a href="https://en.wikipedia.org/wiki/${searchQuery}" target="_blank" rel="noopener noreferrer">Wikipedia</a></p>`;
+      } catch (error) {
+        resultDiv.textContent = "Error balancing the equation.";
+        wikiDiv.innerHTML = "";
+      }
+    }
+  </script>
+</body>
+</html>

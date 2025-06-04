@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Interactive Periodic Table with Groups and Periods</title>
+<style>
+  body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460, #53354a);
+  color: white;
+  min-height: 100vh;
+  transition: background 0.5s ease;
+}
+
+  h1 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: white;
+  }
+  #legend {
+  color: white;
+  margin: 20px auto;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#legend > div {
+  margin: 6px 0;           /* space between legend items vertically */
+  display: inline-flex;     /* inline-flex allows horizontal center and vertical alignment */
+  align-items: center;      /* vertical center align text and box */
+}
+
+.legend-box {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;        /* space between box and label */
+  flex-shrink: 0;           /* fix box size */
+  border: 1px solid white;  /* optional: border for visibility */
+}
+
+
+  #group-labels {
+    display: grid;
+    grid-template-columns: 50px repeat(18, 60px);
+    justify-content: center;
+    gap: 6px;
+    margin: 0 auto 5px auto;
+    max-width: 1232px;
+    user-select: none;
+    font-weight: bold;
+  }
+  #group-labels > div {
+    text-align: center;
+    font-weight: bold;
+    color: white;
+    line-height: 50px;
+    user-select: none;
+    height: 50px;
+  }
+  #periodic-table-wrapper {
+    display: flex;
+    justify-content: center;
+    max-width: 1232px;
+    margin: 0 auto;
+  }
+  #period-labels {
+    width: 50px;
+    display: grid;
+    grid-template-rows: repeat(9, 60px);
+    gap: 6px;
+    margin-right: 6px;
+    user-select: none;
+    font-weight: bold;
+    color: white;
+  }
+  #period-labels > div {
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+  }
+  #periodic-table {
+    display: grid;
+    grid-template-columns: repeat(18, 60px);
+    grid-gap: 6px;
+  }
+  .element {
+    background-color: #ddd;
+    border: 1px solid #999;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    padding: 5px 0;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: transform 0.15s ease;
+    color: white;
+  }
+  .element:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 8px #666;
+  }
+  .element .atomic-num {
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .element .symbol {
+    font-size: 22px;
+    font-weight: bold;
+  }
+  .element .name {
+    font-size: 10px;
+  }
+  .atomic-num {
+  font-weight: bold;
+  color: #ffffff;
+}
+
+
+  /* Coloring categories */
+.alkali-metal { background-color: #FF7F50; }        /* Coral or orange-red */
+.alkaline-earth { background-color: #FFD700; }      /* Gold */
+.transition-metal { background-color: #FF4500; }    /* OrangeRed */
+.post-transition-metal { background-color: #DA70D6; } /* Orchid */
+.metalloid { background-color: #ADFF2F; }           /* GreenYellow */
+.nonmetal { background-color: #7FFFD4; }            /* Aquamarine */
+.halogen { background-color: #FF69B4; }             /* Hot Pink */
+.noble-gas { background-color: #1E90FF; }           /* Dodger Blue */
+.lanthanide { background-color: #FF8C00; }          /* DarkOrange */
+.actinide { background-color: #BA55D3; }            /* MediumOrchid */
+
+
+  /* Empty cells for spacing */
+  .empty-cell {
+    background: transparent;
+    border: none;
+    cursor: default;
+  }
+
+  #info {
+    max-width: 500px;
+    margin: 25px auto 0 auto;
+    background: #00FFFF;
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: 0 0 10px #ccc;
+    white-space: pre-line;
+    font-family: 'Courier New', Courier, monospace;
+    min-height: 150px;
+    color: black;
+  }
+  
+</style>
+</head>
+<body>
+
+<h1>INTERACTIVE PERIODIC TABLE</h1>
+<div id="legend">
+  <div><span class="legend-box alkali-metal"></span> Alkali Metal</div>
+  <div><span class="legend-box alkaline-earth"></span> Alkaline Earth Metal</div>
+  <div><span class="legend-box transition-metal"></span> Transition Metal</div>
+  <div><span class="legend-box post-transition-metal"></span> Post-Transition Metal</div>
+  <div><span class="legend-box metalloid"></span> Metalloid</div>
+  <div><span class="legend-box nonmetal"></span> Nonmetal</div>
+  <div><span class="legend-box halogen"></span> Halogen</div>
+  <div><span class="legend-box noble-gas"></span> Noble Gas</div>
+  <div><span class="legend-box lanthanide"></span> Lanthanide</div>
+  <div><span class="legend-box actinide"></span> Actinide</div>
+</div>
+
+<div id="group-labels">
+  <div></div> <!-- empty cell for spacing -->
+  <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div>
+  <div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div><div>15</div><div>16</div>
+  <div>17</div><div>18</div>
+</div>
+
+<div id="periodic-table-wrapper">
+  <div id="period-labels">
+    <div>1</div>
+    <div>2</div>
+    <div>3</div>
+    <div>4</div>
+    <div>5</div>
+    <div>6</div>
+    <div>7</div>
+  </div>
+  <div id="periodic-table">
+    <!-- Your element cells go here -->
+  </div>
+</div>
+
+<div id="info">Click an element to see details here</div>
+
+<script>
+  const elements = [
+    [1,"H","nonmetal",1,1],
+    [2,"He","noble-gas",1,18],
+    [3,"Li","alkali-metal",2,1],
+    [4,"Be","alkaline-earth",2,2],
+    [5,"B","metalloid",2,13],
+    [6,"C","nonmetal",2,14],
+    [7,"N","nonmetal",2,15],
+    [8,"O","nonmetal",2,16],
+    [9,"F","halogen",2,17],
+    [10,"Ne","noble-gas",2,18],
+    [11,"Na","alkali-metal",3,1],
+    [12,"Mg","alkaline-earth",3,2],
+    [13,"Al","post-transition-metal",3,13],
+    [14,"Si","metalloid",3,14],
+    [15,"P","nonmetal",3,15],
+    [16,"S","nonmetal",3,16],
+    [17,"Cl","halogen",3,17],
+    [18,"Ar","noble-gas",3,18],
+    [19,"K","alkali-metal",4,1],
+    [20,"Ca","alkaline-earth",4,2],
+    [21,"Sc","transition-metal",4,3],
+    [22,"Ti","transition-metal",4,4],
+    [23,"V","transition-metal",4,5],
+    [24,"Cr","transition-metal",4,6],
+    [25,"Mn","transition-metal",4,7],
+    [26,"Fe","transition-metal",4,8],
+    [27,"Co","transition-metal",4,9],
+    [28,"Ni","transition-metal",4,10],
+    [29,"Cu","transition-metal",4,11],
+    [30,"Zn","transition-metal",4,12],
+    [31,"Ga","post-transition-metal",4,13],
+    [32,"Ge","metalloid",4,14],
+    [33,"As","metalloid",4,15],
+    [34,"Se","nonmetal",4,16],
+    [35,"Br","halogen",4,17],
+    [36,"Kr","noble-gas",4,18],
+    [37,"Rb","alkali-metal",5,1],
+    [38,"Sr","alkaline-earth",5,2],
+    [39,"Y","transition-metal",5,3],
+    [40,"Zr","transition-metal",5,4],
+    [41,"Nb","transition-metal",5,5],
+    [42,"Mo","transition-metal",5,6],
+    [43,"Tc","transition-metal",5,7],
+    [44,"Ru","transition-metal",5,8],
+    [45,"Rh","transition-metal",5,9],
+    [46,"Pd","transition-metal",5,10],
+    [47,"Ag","transition-metal",5,11],
+    [48,"Cd","transition-metal",5,12],
+    [49,"In","post-transition-metal",5,13],
+    [50,"Sn","post-transition-metal",5,14],
+    [51,"Sb","metalloid",5,15],
+    [52,"Te","metalloid",5,16],
+    [53,"I","halogen",5,17],
+    [54,"Xe","noble-gas",5,18],
+    [55,"Cs","alkali-metal",6,1],
+    [56,"Ba","alkaline-earth",6,2],
+    [57,"La","lanthanide",8,4],
+    [58,"Ce","lanthanide",8,5],
+    [59,"Pr","lanthanide",8,6],
+    [60,"Nd","lanthanide",8,7],
+    [61,"Pm","lanthanide",8,8],
+    [62,"Sm","lanthanide",8,9],
+    [63,"Eu","lanthanide",8,10],
+    [64,"Gd","lanthanide",8,11],
+    [65,"Tb","lanthanide",8,12],
+    [66,"Dy","lanthanide",8,13],
+    [67,"Ho","lanthanide",8,14],
+    [68,"Er","lanthanide",8,15],
+    [69,"Tm","lanthanide",8,16],
+    [70,"Yb","lanthanide",8,17],
+    [71,"Lu","lanthanide",8,18],
+    [72,"Hf","transition-metal",6,4],
+    [73,"Ta","transition-metal",6,5],
+    [74,"W","transition-metal",6,6],
+    [75,"Re","transition-metal",6,7],
+    [76,"Os","transition-metal",6,8],
+    [77,"Ir","transition-metal",6,9],
+    [78,"Pt","transition-metal",6,10],
+    [79,"Au","transition-metal",6,11],
+    [80,"Hg","transition-metal",6,12],
+    [81,"Tl","post-transition-metal",6,13],
+    [82,"Pb","post-transition-metal",6,14],
+    [83,"Bi","post-transition-metal",6,15],
+    [84,"Po","metalloid",6,16],
+    [85,"At","halogen",6,17],
+    [86,"Rn","noble-gas",6,18],
+    [87,"Fr","alkali-metal",7,1],
+    [88,"Ra","alkaline-earth",7,2],
+    [89,"Ac","actinide",9,4],
+    [90,"Th","actinide",9,5],
+    [91,"Pa","actinide",9,6],
+    [92,"U","actinide",9,7],
+    [93,"Np","actinide",9,8],
+    [94,"Pu","actinide",9,9],
+    [95,"Am","actinide",9,10],
+    [96,"Cm","actinide",9,11],
+    [97,"Bk","actinide",9,12],
+    [98,"Cf","actinide",9,13],
+    [99,"Es","actinide",9,14],
+    [100,"Fm","actinide",9,15],
+    [101,"Md","actinide",9,16],
+    [102,"No","actinide",9,17],
+    [103,"Lr","actinide",9,18],
+    [104,"Rf","transition-metal",7,4],
+    [105,"Db","transition-metal",7,5],
+    [106,"Sg","transition-metal",7,6],
+    [107,"Bh","transition-metal",7,7],
+    [108,"Hs","transition-metal",7,8],
+    [109,"Mt","transition-metal",7,9],
+    [110,"Ds","transition-metal",7,10],
+    [111,"Rg","transition-metal",7,11],
+    [112,"Cn","transition-metal",7,12],
+    [113,"Nh","post-transition-metal",7,13],
+    [114,"Fl","post-transition-metal",7,14],
+    [115,"Mc","post-transition-metal",7,15],
+    [116,"Lv","post-transition-metal",7,16],
+    [117,"Ts","halogen",7,17],
+    [118,"Og","noble-gas",7,18],
+  ];
+
+  // Data for elements with more details, keyed by symbol
+  const elementData = {
+  H: {atomicNumber:1, name:"Hydrogen", mass:1.008, electronConfig:"1s¹", density:0.00008988, meltingPoint:13.99, boilingPoint:20.271,
+       group:1, period:1, block:'s', type:'nonmetal'},
+  He: {atomicNumber:2, name:"Helium", mass:4.002602, electronConfig:"1s²", density:0.0001785, meltingPoint:0.95, boilingPoint:4.22,
+       group:18, period:1, block:'s', type:'noble gas'},
+  Li: {atomicNumber:3, name:"Lithium", mass:6.94, electronConfig:"[He] 2s¹", density:0.534, meltingPoint:453.65, boilingPoint:1603,
+       group:1, period:2, block:'s', type:'alkali metal'},
+  Be: {atomicNumber:4, name:"Beryllium", mass:9.0122, electronConfig:"[He] 2s²", density:1.85, meltingPoint:1560, boilingPoint:2742,
+       group:2, period:2, block:'s', type:'alkaline earth metal'},
+  B: {atomicNumber:5, name:"Boron", mass:10.81, electronConfig:"[He] 2s² 2p¹", density:2.34, meltingPoint:2349, boilingPoint:4200,
+       group:13, period:2, block:'p', type:'metalloid'},
+  C: {atomicNumber:6, name:"Carbon", mass:12.011, electronConfig:"[He] 2s² 2p²", density:2.267, meltingPoint:3823, boilingPoint:4300,
+       group:14, period:2, block:'p', type:'nonmetal'},
+  N: {atomicNumber:7, name:"Nitrogen", mass:14.007, electronConfig:"[He] 2s² 2p³", density:0.0012506, meltingPoint:63.15, boilingPoint:77.36,
+       group:15, period:2, block:'p', type:'nonmetal'},
+  O: {atomicNumber:8, name:"Oxygen", mass:15.999, electronConfig:"[He] 2s² 2p⁴", density:0.001429, meltingPoint:54.36, boilingPoint:90.20,
+       group:16, period:2, block:'p', type:'nonmetal'},
+  F: {atomicNumber:9, name:"Fluorine", mass:18.998, electronConfig:"[He] 2s² 2p⁵", density:0.001696, meltingPoint:53.53, boilingPoint:85.03,
+       group:17, period:2, block:'p', type:'halogen'},
+  Ne: {atomicNumber:10, name:"Neon", mass:20.180, electronConfig:"[He] 2s² 2p⁶", density:0.0008999, meltingPoint:24.56, boilingPoint:27.07,
+       group:18, period:2, block:'p', type:'noble gas'},
+  Na: {atomicNumber:11, name:"Sodium", mass:22.990, electronConfig:"[Ne] 3s¹", density:0.971, meltingPoint:370.87, boilingPoint:1156,
+       group:1, period:3, block:'s', type:'alkali metal'},
+  Mg: {atomicNumber:12, name:"Magnesium", mass:24.305, electronConfig:"[Ne] 3s²", density:1.738, meltingPoint:923, boilingPoint:1363,
+       group:2, period:3, block:'s', type:'alkaline earth metal'},
+  Al: {atomicNumber:13, name:"Aluminium", mass:26.982, electronConfig:"[Ne] 3s² 3p¹", density:2.70, meltingPoint:933.47, boilingPoint:2792,
+       group:13, period:3, block:'p', type:'post-transition metal'},
+  Si: {atomicNumber:14, name:"Silicon", mass:28.085, electronConfig:"[Ne] 3s² 3p²", density:2.3296, meltingPoint:1687, boilingPoint:3538,
+       group:14, period:3, block:'p', type:'metalloid'},
+  P: {atomicNumber:15, name:"Phosphorus", mass:30.974, electronConfig:"[Ne] 3s² 3p³", density:1.82, meltingPoint:317.3, boilingPoint:553.65,
+       group:15, period:3, block:'p', type:'nonmetal'},
+  S: {atomicNumber:16, name:"Sulfur", mass:32.06, electronConfig:"[Ne] 3s² 3p⁴", density:2.07, meltingPoint:388.36, boilingPoint:717.87,
+       group:16, period:3, block:'p', type:'nonmetal'},
+  Cl: {atomicNumber:17, name:"Chlorine", mass:35.45, electronConfig:"[Ne] 3s² 3p⁵", density:0.003214, meltingPoint:171.6, boilingPoint:239.11,
+       group:17, period:3, block:'p', type:'halogen'},
+  Ar: {atomicNumber:18, name:"Argon", mass:39.948, electronConfig:"[Ne] 3s² 3p⁶", density:0.0017837, meltingPoint:83.81, boilingPoint:87.30,
+       group:18, period:3, block:'p', type:'noble gas'},
+  K: {atomicNumber:19, name:"Potassium", mass:39.0983, electronConfig:"[Ar] 4s¹", density:0.862, meltingPoint:336.53, boilingPoint:1032,
+       group:1, period:4, block:'s', type:'alkali metal'},
+  Ca: {atomicNumber:20, name:"Calcium", mass:40.078, electronConfig:"[Ar] 4s²", density:1.55, meltingPoint:1115, boilingPoint:1757,
+       group:2, period:4, block:'s', type:'alkaline earth metal'},
+  Sc: {atomicNumber:21, name:"Scandium", mass:44.955908, electronConfig:"[Ar] 3d¹ 4s²", density:2.985, meltingPoint:1814, boilingPoint:3109,
+       group:3, period:4, block:'d', type:'transition metal'},
+  Ti: {atomicNumber:22, name:"Titanium", mass:47.867, electronConfig:"[Ar] 3d² 4s²", density:4.506, meltingPoint:1941, boilingPoint:3560,
+       group:4, period:4, block:'d', type:'transition metal'},
+  V: {atomicNumber:23, name:"Vanadium", mass:50.9415, electronConfig:"[Ar] 3d³ 4s²", density:6.11, meltingPoint:2183, boilingPoint:3680,
+       group:5, period:4, block:'d', type:'transition metal'},
+  Cr: {atomicNumber:24, name:"Chromium", mass:51.9961, electronConfig:"[Ar] 3d⁵ 4s¹", density:7.19, meltingPoint:2180, boilingPoint:2944,
+       group:6, period:4, block:'d', type:'transition metal'},
+  Mn: {atomicNumber:25, name:"Manganese", mass:54.93804, electronConfig:"[Ar] 3d⁵ 4s²", density:7.43, meltingPoint:1519, boilingPoint:2334,
+       group:7, period:4, block:'d', type:'transition metal'},
+  Fe: {atomicNumber:26, name:"Iron", mass:55.845, electronConfig:"[Ar] 3d⁶ 4s²", density:7.874, meltingPoint:1811, boilingPoint:3134,
+       group:8, period:4, block:'d', type:'transition metal'},
+  Co: {atomicNumber:27, name:"Cobalt", mass:58.93319, electronConfig:"[Ar] 3d⁷ 4s²", density:8.9, meltingPoint:1768, boilingPoint:3200,
+       group:9, period:4, block:'d', type:'transition metal'},
+  Ni: {atomicNumber:28, name:"Nickel", mass:58.6934, electronConfig:"[Ar] 3d⁸ 4s²", density:8.908, meltingPoint:1728, boilingPoint:3186,
+       group:10, period:4, block:'d', type:'transition metal'},
+  Cu: {atomicNumber:29, name:"Copper", mass:63.546, electronConfig:"[Ar] 3d¹⁰ 4s¹", density:8.96, meltingPoint:1357.77, boilingPoint:2835,
+       group:11, period:4, block:'d', type:'transition metal'},
+  Zn: {atomicNumber:30, name:"Zinc", mass:65.38, electronConfig:"[Ar] 3d¹⁰ 4s²", density:7.14, meltingPoint:692.68, boilingPoint:1180,
+       group:12, period:4, block:'d', type:'transition metal'},
+  Ga: {atomicNumber:31, name:"Gallium", mass:69.723, electronConfig:"[Ar] 3d¹⁰ 4s² 4p¹", density:5.91, meltingPoint:302.91, boilingPoint:2477,
+       group:13, period:4, block:'p', type:'post-transition metal'},
+  Ge: {atomicNumber:32, name:"Germanium", mass:72.63, electronConfig:"[Ar] 3d¹⁰ 4s² 4p²", density:5.32, meltingPoint:1211.4, boilingPoint:3106,
+       group:14, period:4, block:'p', type:'metalloid'},
+  As: {atomicNumber:33, name:"Arsenic", mass:74.9216, electronConfig:"[Ar] 3d¹⁰ 4s² 4p³", density:5.776, meltingPoint:1090, boilingPoint:887,
+       group:15, period:4, block:'p', type:'metalloid'},
+  Se: {atomicNumber:34, name:"Selenium", mass:78.96, electronConfig:"[Ar] 3d¹⁰ 4s² 4p⁴", density:4.81, meltingPoint:494, boilingPoint:958,
+       group:16, period:4, block:'p', type:'nonmetal'},
+  Br: {atomicNumber:35, name:"Bromine", mass:79.904, electronConfig:"[Ar] 3d¹⁰ 4s² 4p⁵", density:3.1028, meltingPoint:265.8, boilingPoint:332,
+       group:17, period:4, block:'p', type:'halogen'},
+  Kr: {atomicNumber:36, name:"Krypton", mass:83.798, electronConfig:"[Ar] 3d¹⁰ 4s² 4p⁶", density:0.003733, meltingPoint:115.79, boilingPoint:119.93,
+       group:18, period:4, block:'p', type:'noble gas'},
+  Rb: {atomicNumber:37, name:"Rubidium", mass:85.4678, electronConfig:"[Kr] 5s¹", density:1.532, meltingPoint:312.46, boilingPoint:961,
+       group:1, period:5, block:'s', type:'alkali metal'},
+  Sr: {atomicNumber:38, name:"Strontium", mass:87.62, electronConfig:"[Kr] 5s²", density:2.64, meltingPoint:1050, boilingPoint:1655,
+       group:2, period:5, block:'s', type:'alkaline earth metal'},
+  Y:  {atomicNumber:39, name:"Yttrium", mass:88.90584, electronConfig:"[Kr] 4d¹ 5s²", density:4.47, meltingPoint:1799, boilingPoint:3203,
+       group:3, period:5, block:'d', type:'transition metal'},
+  Zr: {atomicNumber:40, name:"Zirconium", mass:91.224, electronConfig:"[Kr] 4d² 5s²", density:6.52, meltingPoint:2128, boilingPoint:4682,
+       group:4, period:5, block:'d', type:'transition metal'},
+  Nb: {atomicNumber:41, name:"Niobium", mass:92.90638, electronConfig:"[Kr] 4d⁴ 5s¹", density:8.57, meltingPoint:2750, boilingPoint:5017,
+       group:5, period:5, block:'d', type:'transition metal'},
+  Mo: {atomicNumber:42, name:"Molybdenum", mass:95.95, electronConfig:"[Kr] 4d⁵ 5s¹", density:10.22, meltingPoint:2896, boilingPoint:4912,
+       group:6, period:5, block:'d', type:'transition metal'},
+  Tc: {atomicNumber:43, name:"Technetium", mass:98, electronConfig:"[Kr] 4d⁵ 5s²", density:11.5, meltingPoint:2430, boilingPoint:4538,
+       group:7, period:5, block:'d', type:'transition metal'},
+  Ru: {atomicNumber:44, name:"Ruthenium", mass:101.07, electronConfig:"[Kr] 4d⁷ 5s¹", density:12.45, meltingPoint:2607, boilingPoint:4423,
+       group:8, period:5, block:'d', type:'transition metal'},
+  Rh: {atomicNumber:45, name:"Rhodium", mass:102.9055, electronConfig:"[Kr] 4d⁸ 5s¹", density:12.41, meltingPoint:2237, boilingPoint:3968,
+       group:9, period:5, block:'d', type:'transition metal'},
+  Pd: {atomicNumber:46, name:"Palladium", mass:106.42, electronConfig:"[Kr] 4d¹⁰", density:12.02, meltingPoint:1828.05, boilingPoint:3236,
+       group:10, period:5, block:'d', type:'transition metal'},
+  Ag: {atomicNumber:47, name:"Silver", mass:107.8682, electronConfig:"[Kr] 4d¹⁰ 5s¹", density:10.49, meltingPoint:1234.93, boilingPoint:2435,
+       group:11, period:5, block:'d', type:'transition metal'},
+  Cd: {atomicNumber:48, name:"Cadmium", mass:112.414, electronConfig:"[Kr] 4d¹⁰ 5s²", density:8.65, meltingPoint:594.22, boilingPoint:1040,
+       group:12, period:5, block:'d', type:'transition metal'},
+  In: {atomicNumber:49, name:"Indium", mass:114.818, electronConfig:"[Kr] 4d¹⁰ 5s² 5p¹", density:7.31, meltingPoint:429.75, boilingPoint:2345,
+       group:13, period:5, block:'p', type:'post-transition metal'},
+  Sn: {atomicNumber:50, name:"Tin", mass:118.71, electronConfig:"[Kr] 4d¹⁰ 5s² 5p²", density:7.31, meltingPoint:505.08, boilingPoint:2875,
+       group:14, period:5, block:'p', type:'post-transition metal'},
+  Sb: {atomicNumber:51, name:"Antimony", mass:121.76, electronConfig:"[Kr] 4d¹⁰ 5s² 5p³", density:6.697, meltingPoint:903.78, boilingPoint:1860,
+       group:15, period:5, block:'p', type:'metalloid'},
+  Te: {atomicNumber:52, name:"Tellurium", mass:127.6, electronConfig:"[Kr] 4d¹⁰ 5s² 5p⁴", density:6.24, meltingPoint:722.66, boilingPoint:1261,
+       group:16, period:5, block:'p', type:'metalloid'},
+  I: {atomicNumber:53, name:"Iodine", mass:126.90447, electronConfig:"[Kr] 4d¹⁰ 5s² 5p⁵", density:4.93, meltingPoint:386.85, boilingPoint:457.4,
+       group:17, period:5, block:'p', type:'halogen'},
+  Xe: {atomicNumber:54, name:"Xenon", mass:131.293, electronConfig:"[Kr] 4d¹⁰ 5s² 5p⁶", density:0.005887, meltingPoint:161.36, boilingPoint:165.03,
+       group:18, period:5, block:'p', type:'noble gas'},
+  Cs: {atomicNumber:55, name:"Caesium", mass:132.90545, electronConfig:"[Xe] 6s¹", density:1.93, meltingPoint:301.7, boilingPoint:944,
+       group:1, period:6, block:'s', type:'alkali metal'},
+  Ba: {atomicNumber:56, name:"Barium", mass:137.327, electronConfig:"[Xe] 6s²", density:3.62, meltingPoint:1000, boilingPoint:2170,
+       group:2, period:6, block:'s', type:'alkaline earth metal'},
+  // Lanthanides and Actinides merged above
+  La: {atomicNumber:57, name:"Lanthanum", mass:138.90547, electronConfig:"[Xe] 5d¹6s²", density:6.145, meltingPoint:1193, boilingPoint:3737,
+     group:3, period:6, block:'d', type:'lanthanide'},
+Ce: {atomicNumber:58, name:"Cerium", mass:140.116, electronConfig:"[Xe] 4f¹5d¹6s²", density:6.770, meltingPoint:1068, boilingPoint:3716,
+     group:3, period:6, block:'f', type:'lanthanide'},
+Pr: {atomicNumber:59, name:"Praseodymium", mass:140.90766, electronConfig:"[Xe] 4f³6s²", density:6.773, meltingPoint:1208, boilingPoint:3793,
+     group:3, period:6, block:'f', type:'lanthanide'},
+Nd: {atomicNumber:60, name:"Neodymium", mass:144.242, electronConfig:"[Xe] 4f⁴6s²", density:7.007, meltingPoint:1297, boilingPoint:3347,
+     group:3, period:6, block:'f', type:'lanthanide'},
+Pm: {atomicNumber:61, name:"Promethium", mass:145, electronConfig:"[Xe] 4f⁵6s²", density:7.26, meltingPoint:1315, boilingPoint:3273,
+     group:3, period:6, block:'f', type:'lanthanide'},
+Sm: {atomicNumber:62, name:"Samarium", mass:150.36, electronConfig:"[Xe] 4f⁶6s²", density:7.520, meltingPoint:1345, boilingPoint:2067,
+     group:3, period:6, block:'f', type:'lanthanide'},
+Eu: {atomicNumber:63, name:"Europium", mass:151.964, electronConfig:"[Xe] 4f⁷6s²", density:5.264, meltingPoint:1099, boilingPoint:1802,
+     group:3, period:6, block:'f', type:'lanthanide'},
+Gd: {atomicNumber:64, name:"Gadolinium", mass:157.25, electronConfig:"[Xe] 4f⁷5d¹6s²", density:7.900, meltingPoint:1585, boilingPoint:3546,
+     group:3, period:6, block:'f', type:'lanthanide'},
+Tb: {atomicNumber:65, name:"Terbium", mass:158.92535, electronConfig:"[Xe] 4f⁹6s²", density:8.230, meltingPoint:1629, boilingPoint:3503,
+     group:3, period:6, block:'f', type:'lanthanide'},
+Dy: {atomicNumber:66, name:"Dysprosium", mass:162.500, electronConfig:"[Xe] 4f¹⁰6s²", density:8.540, meltingPoint:1680, boilingPoint:2840,
+     group:3, period:6, block:'f', type:'lanthanide'},
+Ho: {atomicNumber:67, name:"Holmium", mass:164.93033, electronConfig:"[Xe] 4f¹¹6s²", density:8.795, meltingPoint:1734, boilingPoint:2873,
+     group:3, period:6, block:'f', type:'lanthanide'},
+Er: {atomicNumber:68, name:"Erbium", mass:167.259, electronConfig:"[Xe] 4f¹²6s²", density:9.066, meltingPoint:1802, boilingPoint:3141,
+     group:3, period:6, block:'f', type:'lanthanide'},
+Tm: {atomicNumber:69, name:"Thulium", mass:168.93422, electronConfig:"[Xe] 4f¹³6s²", density:9.321, meltingPoint:1818, boilingPoint:2223,
+     group:3, period:6, block:'f', type:'lanthanide'},
+Yb: {atomicNumber:70, name:"Ytterbium", mass:173.045, electronConfig:"[Xe] 4f¹⁴6s²", density:6.90, meltingPoint:1097, boilingPoint:1469,
+     group:3, period:6, block:'f', type:'lanthanide'},
+Lu: {atomicNumber:71, name:"Lutetium", mass:174.9668, electronConfig:"[Xe] 4f¹⁴5d¹6s²", density:9.841, meltingPoint:1925, boilingPoint:3675,
+     group:3, period:6, block:'d', type:'lanthanide'},
+
+  Hf: {atomicNumber:72, name:"Hafnium", mass:178.49, electronConfig:"[Xe] 4f¹⁴ 5d² 6s²", density:13.31, meltingPoint:2506, boilingPoint:4876,
+       group:4, period:6, block:'d', type:'transition metal'},
+  Ta: {atomicNumber:73, name:"Tantalum", mass:180.94788, electronConfig:"[Xe] 4f¹⁴ 5d³ 6s²", density:16.69, meltingPoint:3290, boilingPoint:5731,
+       group:5, period:6, block:'d', type:'transition metal'},
+  W: {atomicNumber:74, name:"Tungsten", mass:183.84, electronConfig:"[Xe] 4f¹⁴ 5d⁴ 6s²", density:19.25, meltingPoint:3695, boilingPoint:5828,
+       group:6, period:6, block:'d', type:'transition metal'},
+  Re: {atomicNumber:75, name:"Rhenium", mass:186.207, electronConfig:"[Xe] 4f¹⁴ 5d⁵ 6s²", density:21.02, meltingPoint:3459, boilingPoint:5869,
+       group:7, period:6, block:'d', type:'transition metal'},
+  Os: {atomicNumber:76, name:"Osmium", mass:190.23, electronConfig:"[Xe] 4f¹⁴ 5d⁶ 6s²", density:22.59, meltingPoint:3306, boilingPoint:5285,
+       group:8, period:6, block:'d', type:'transition metal'},
+  Ir: {atomicNumber:77, name:"Iridium", mass:192.217, electronConfig:"[Xe] 4f¹⁴ 5d⁷ 6s²", density:22.56, meltingPoint:2719, boilingPoint:4701,
+       group:9, period:6, block:'d', type:'transition metal'},
+  Pt: {atomicNumber:78, name:"Platinum", mass:195.084, electronConfig:"[Xe] 4f¹⁴ 5d⁹ 6s¹", density:21.45, meltingPoint:2041.4, boilingPoint:4098,
+       group:10, period:6, block:'d', type:'transition metal'},
+  Au: {atomicNumber:79, name:"Gold", mass:196.966569, electronConfig:"[Xe] 4f¹⁴ 5d¹⁰ 6s¹", density:19.32, meltingPoint:1337.33, boilingPoint:3129,
+       group:11, period:6, block:'d', type:'transition metal'},
+  Hg: {atomicNumber:80, name:"Mercury", mass:200.592, electronConfig:"[Xe] 4f¹⁴ 5d¹⁰ 6s²", density:13.534, meltingPoint:234.32, boilingPoint:629.88,
+       group:12, period:6, block:'d', type:'transition metal'},
+  Tl: {atomicNumber:81, name:"Thallium", mass:204.38, electronConfig:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹", density:11.85, meltingPoint:577, boilingPoint:1746,
+       group:13, period:6, block:'p', type:'post-transition metal'},
+  Pb: {atomicNumber:82, name:"Lead", mass:207.2, electronConfig:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²", density:11.34, meltingPoint:600.61, boilingPoint:2022,
+       group:14, period:6, block:'p', type:'post-transition metal'},
+  Bi: {atomicNumber:83, name:"Bismuth", mass:208.9804, electronConfig:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³", density:9.78, meltingPoint:544.7, boilingPoint:1837,
+       group:15, period:6, block:'p', type:'post-transition metal'},
+  Po: {atomicNumber:84, name:"Polonium", mass:209, electronConfig:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴", density:9.32, meltingPoint:527, boilingPoint:1235,
+       group:16, period:6, block:'p', type:'post-transition metal'},
+  At: {atomicNumber:85, name:"Astatine", mass:210, electronConfig:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵", density:null, meltingPoint:null, boilingPoint:null,
+       group:17, period:6, block:'p', type:'halogen'},
+  Rn: {atomicNumber:86, name:"Radon", mass:222, electronConfig:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶", density:0.00973, meltingPoint:202, boilingPoint:211.5,
+       group:18, period:6, block:'p', type:'noble gas'},
+  Fr: {atomicNumber:87, name:"Francium", mass:223, electronConfig:"[Rn] 7s¹", density:1.87, meltingPoint:300, boilingPoint:950,
+       group:1, period:7, block:'s', type:'alkali metal'},
+  Ra: {atomicNumber:88, name:"Radium", mass:226, electronConfig:"[Rn] 7s²", density:5, meltingPoint:973, boilingPoint:2010,
+       group:2, period:7, block:'s', type:'alkaline earth metal'},
+  // Actinides start here, but included earlier for simplicity
+  Ac: {atomicNumber:89, name:"Actinium", mass:227, electronConfig:"[Rn] 6d¹7s²", density:10.07, meltingPoint:1323, boilingPoint:3471,
+     group:3, period:7, block:'d', type:'actinide'},
+Th: {atomicNumber:90, name:"Thorium", mass:232.0377, electronConfig:"[Rn] 6d²7s²", density:11.72, meltingPoint:2023, boilingPoint:5061,
+     group:3, period:7, block:'f', type:'actinide'},
+Pa: {atomicNumber:91, name:"Protactinium", mass:231.03588, electronConfig:"[Rn] 5f²6d¹7s²", density:15.37, meltingPoint:1841, boilingPoint:4300,
+     group:3, period:7, block:'f', type:'actinide'},
+U: {atomicNumber:92, name:"Uranium", mass:238.02891, electronConfig:"[Rn] 5f³6d¹7s²", density:18.95, meltingPoint:1405.3, boilingPoint:4404,
+     group:3, period:7, block:'f', type:'actinide'},
+Np: {atomicNumber:93, name:"Neptunium", mass:237, electronConfig:"[Rn] 5f⁴6d¹7s²", density:20.45, meltingPoint:917, boilingPoint:4273,
+     group:3, period:7, block:'f', type:'actinide'},
+Pu: {atomicNumber:94, name:"Plutonium", mass:244, electronConfig:"[Rn] 5f⁶7s²", density:19.86, meltingPoint:912.5, boilingPoint:3505,
+     group:3, period:7, block:'f', type:'actinide'},
+Am: {atomicNumber:95, name:"Americium", mass:243, electronConfig:"[Rn] 5f⁷7s²", density:12.00, meltingPoint:1449, boilingPoint:2880,
+     group:3, period:7, block:'f', type:'actinide'},
+Cm: {atomicNumber:96, name:"Curium", mass:247, electronConfig:"[Rn] 5f⁷6d¹7s²", density:13.51, meltingPoint:1613, boilingPoint:3383,
+     group:3, period:7, block:'f', type:'actinide'},
+Bk: {atomicNumber:97, name:"Berkelium", mass:247, electronConfig:"[Rn] 5f⁹7s²", density:14.78, meltingPoint:1259, boilingPoint:2900,
+     group:3, period:7, block:'f', type:'actinide'},
+Cf: {atomicNumber:98, name:"Californium", mass:251, electronConfig:"[Rn] 5f¹⁰7s²", density:15.10, meltingPoint:1173, boilingPoint:1743,
+     group:3, period:7, block:'f', type:'actinide'},
+Es: {atomicNumber:99, name:"Einsteinium", mass:252, electronConfig:"[Rn] 5f¹¹7s²", density:8.84, meltingPoint:1133, boilingPoint:null,
+     group:3, period:7, block:'f', type:'actinide'},
+Fm: {atomicNumber:100, name:"Fermium", mass:257, electronConfig:"[Rn] 5f¹²7s²", density:null, meltingPoint:1800, boilingPoint:null,
+     group:3, period:7, block:'f', type:'actinide'},
+Md: {atomicNumber:101, name:"Mendelevium", mass:258, electronConfig:"[Rn] 5f¹³7s²", density:null, meltingPoint:1100, boilingPoint:null,
+     group:3, period:7, block:'f', type:'actinide'},
+No: {atomicNumber:102, name:"Nobelium", mass:259, electronConfig:"[Rn] 5f¹⁴7s²", density:null, meltingPoint:1100, boilingPoint:null,
+     group:3, period:7, block:'f', type:'actinide'},
+Lr: {atomicNumber:103, name:"Lawrencium", mass:266, electronConfig:"[Rn] 5f¹⁴7s²7p¹", density:null, meltingPoint:1900, boilingPoint:null,
+     group:3, period:7, block:'d', type:'actinide'},
+
+  Rf: {atomicNumber:104, name:"Rutherfordium", mass:267, electronConfig:"[Rn] 5f¹⁴ 6d² 7s²", density:17, meltingPoint:2400, boilingPoint:5800,
+       group:4, period:7, block:'d', type:'transition metal'},
+  Db: {atomicNumber:105, name:"Dubnium", mass:268, electronConfig:"[Rn] 5f¹⁴ 6d³ 7s²", density:null, meltingPoint:null, boilingPoint:null,
+       group:5, period:7, block:'d', type:'transition metal'},
+  Sg: {atomicNumber:106, name:"Seaborgium", mass:269, electronConfig:"[Rn] 5f¹⁴ 6d⁴ 7s²", density:null, meltingPoint:null, boilingPoint:null,
+       group:6, period:7, block:'d', type:'transition metal'},
+  Bh: {atomicNumber:107, name:"Bohrium", mass:270, electronConfig:"[Rn] 5f¹⁴ 6d⁵ 7s²", density:null, meltingPoint:null, boilingPoint:null,
+       group:7, period:7, block:'d', type:'transition metal'},
+  Hs: {atomicNumber:108, name:"Hassium", mass:269, electronConfig:"[Rn] 5f¹⁴ 6d⁶ 7s²", density:null, meltingPoint:null, boilingPoint:null,
+       group:8, period:7, block:'d', type:'transition metal'},
+  Mt: {atomicNumber:109, name:"Meitnerium", mass:278, electronConfig:"[Rn] 5f¹⁴ 6d⁷ 7s²", density:null, meltingPoint:null, boilingPoint:null,
+       group:9, period:7, block:'d', type:'transition metal'},
+  Ds: {atomicNumber:110, name:"Darmstadtium", mass:281, electronConfig:"[Rn] 5f¹⁴ 6d⁹ 7s¹", density:null, meltingPoint:null, boilingPoint:null,
+       group:10, period:7, block:'d', type:'transition metal'},
+  Rg: {atomicNumber:111, name:"Roentgenium", mass:282, electronConfig:"[Rn] 5f¹⁴ 6d¹⁰ 7s¹", density:null, meltingPoint:null, boilingPoint:null,
+       group:11, period:7, block:'d', type:'transition metal'},
+  Cn: {atomicNumber:112, name:"Copernicium", mass:285, electronConfig:"[Rn] 5f¹⁴ 6d¹⁰ 7s²", density:14, meltingPoint:null, boilingPoint:null,
+       group:12, period:7, block:'d', type:'transition metal'},
+  Nh: {atomicNumber:113, name:"Nihonium", mass:286, electronConfig:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹", density:null, meltingPoint:null, boilingPoint:null,
+       group:13, period:7, block:'p', type:'post-transition metal'},
+  Fl: {atomicNumber:114, name:"Flerovium", mass:289, electronConfig:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²", density:14, meltingPoint:null, boilingPoint:null,
+       group:14, period:7, block:'p', type:'post-transition metal'},
+  Mc: {atomicNumber:115, name:"Moscovium", mass:290, electronConfig:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³", density:null, meltingPoint:null, boilingPoint:null,
+       group:15, period:7, block:'p', type:'post-transition metal'},
+  Lv: {atomicNumber:116, name:"Livermorium", mass:293, electronConfig:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴", density:null, meltingPoint:null, boilingPoint:null,
+       group:16, period:7, block:'p', type:'post-transition metal'},
+  Ts: {atomicNumber:117, name:"Tennessine", mass:294, electronConfig:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵", density:null, meltingPoint:null, boilingPoint:null,
+       group:17, period:7, block:'p', type:'halogen'},
+  Og: {atomicNumber:118, name:"Oganesson", mass:294, electronConfig:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶", density:null, meltingPoint:null, boilingPoint:null,
+       group:18, period:7, block:'p', type:'noble gas'},
+};
+  // Create periodic table grid with gaps for empty cells
+  const periodicTable = document.getElementById("periodic-table");
+  const info = document.getElementById("info");
+
+  // We'll create an 9 rows x 18 columns grid:
+  // rows 1-7: periods, row 8: lanthanides, row 9: actinides
+  // Place elements in proper grid row/column according to period/group
+
+  // First, create a 2D array for grid [row][col], initialize to null
+  const gridRows = 9;  // 7 periods + lanthanide(8) + actinide(9)
+  const gridCols = 18;
+
+  let grid = [];
+  for(let r=0; r<gridRows; r++){
+    grid[r] = Array(gridCols).fill(null);
+  }
+
+  elements.forEach(([atomicNum, symbol, cat, period, group]) => {
+  let row, col;
+  if (cat === 'lanthanide') {
+    row = 7; // Lanthanide row (index 7)
+    col = 2 + (atomicNum - 57); // La starts at col 3 (index 2)
+  } else if (cat === 'actinide') {
+    row = 8; // Actinide row (index 8)
+    col = 2 + (atomicNum - 89);  // Ac starts at col 3 (index 2)
+  } else {
+    row = period - 1;
+    col = group - 1;
+  }
+  grid[row][col] = {atomicNum, symbol, cat, period, group};
+});
+
+
+  // Now render the grid
+  for(let r=0; r<gridRows; r++){
+    for(let c=0; c<gridCols; c++){
+      const cell = grid[r][c];
+      const div = document.createElement("div");
+
+      if(cell === null){
+        div.classList.add("empty-cell");
+      } else {
+        div.classList.add("element");
+        div.classList.add(cell.cat.replace(/\s+/g,'-')); // e.g. alkali-metal
+
+        div.innerHTML = `
+          <div class="atomic-num">${cell.atomicNum}</div>
+          <div class="symbol">${cell.symbol}</div>
+        `;
+
+        div.addEventListener("click", () => {
+          // Look up detailed info
+          const e = elementData[cell.symbol] || {};
+          info.textContent = `
+${cell.symbol} - ${e.name || "Unknown"}
+Atomic Number: ${cell.atomicNum}
+Atomic Mass: ${e.mass !== undefined ? e.mass + " u" : "N/A"}
+Electron Configuration: ${e.electronConfig || "N/A"}
+Density: ${e.density !== undefined ? e.density + " g/cm³" : "N/A"}
+Melting Point: ${e.meltingPoint !== undefined ? e.meltingPoint + " K" : "N/A"}
+Boiling Point: ${e.boilingPoint !== undefined ? e.boilingPoint + " K" : "N/A"}
+Group: ${e.group !== undefined ? e.group : cell.group}
+Period: ${e.period !== undefined ? e.period : cell.period}
+Block: ${e.block !== undefined ? e.block.toUpperCase() : "N/A"}
+Type: ${e.type !== undefined ? e.type.charAt(0).toUpperCase() + e.type.slice(1) : cell.cat.charAt(0).toUpperCase() + cell.cat.slice(1)}
+          `.trim();
+        });
+      }
+      periodicTable.appendChild(div);
+    }
+  }
+</script>
+
+</body>
+</html>

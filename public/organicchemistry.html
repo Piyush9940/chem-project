@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ultimate Organic Chemistry Helper + Quiz</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #121212;
+    color: #eee;
+    margin: 0;
+    padding: 0 1rem;
+  }
+  h1, h2 {
+    color: #82aaff;
+  }
+  header {
+    padding: 1rem 0;
+    text-align: center;
+    background-color: #1e1e1e;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #82aaff;
+  }
+  section {
+    margin-bottom: 2rem;
+    background: #222;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  label {
+    display: block;
+    margin: 0.5rem 0 0.2rem;
+    font-weight: 600;
+  }
+  input[type="text"] {
+    width: calc(100% - 40px);
+    font-size: 1rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: none;
+    display: inline-block;
+  }
+  button {
+    margin-top: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    background-color: #82aaff;
+    border: none;
+    border-radius: 6px;
+    color: #121212;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #5f7cff;
+  }
+  pre {
+    background: #1a1a1a;
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  .result {
+    margin-top: 0.8rem;
+    background: #333;
+    padding: 1rem;
+    border-radius: 6px;
+    white-space: pre-wrap;
+    min-height: 3em;
+  }
+  ul {
+    padding-left: 1.2rem;
+  }
+  .flex-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .flex-item {
+    flex: 1 1 300px;
+  }
+  footer {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+    padding: 1rem 0;
+    border-top: 1px solid #444;
+    margin-top: 2rem;
+  }
+  a {
+    color: #82aaff;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  /* Quiz styles */
+  .quiz-question {
+    margin-bottom: 1rem;
+  }
+  .quiz-option {
+    margin-left: 1rem;
+  }
+  .quiz-result {
+    font-weight: 700;
+    margin-top: 1rem;
+    font-size: 1.2rem;
+  }
+  .mic-btn {
+    width: 30px;
+    height: 30px;
+    background: #82aaff;
+    border: none;
+    border-radius: 50%;
+    margin-left: 6px;
+    vertical-align: middle;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ultimate Organic Chemistry Helper</h1>
+  <p>Identify functional groups, basic IUPAC names, reaction pathways & more!</p>
+</header>
+
+<section>
+  <h2>1. Functional Group Identification</h2>
+  <label for="fg-input">Enter organic compound name or formula:</label>
+  <input type="text" id="fg-input" placeholder="e.g. ethanol, acetone, benzene" />
+  <button class="mic-btn" onclick="startListening('fg-input')" title="Speak"></button>
+  <button onclick="identifyFunctionalGroups()">Identify Groups</button>
+  <div id="fg-result" class="result"></div>
+</section>
+
+<section>
+  <h2>2. Basic IUPAC Naming (Simplified)</h2>
+  <label for="iupac-input">Enter organic compound name or formula:</label>
+  <input type="text" id="iupac-input" placeholder="e.g. CH3CH2OH, C3H6O" />
+  <button class="mic-btn" onclick="startListening('iupac-input')" title="Speak"></button>
+  <button onclick="generateIUPAC()">Generate Name</button>
+  <div id="iupac-result" class="result"></div>
+</section>
+
+<section>
+  <h2>3. Common Reaction Pathways</h2>
+  <ul>
+    <li><strong>Substitution Reactions:</strong> Replacement of an atom/group by another (e.g., alkyl halide + nucleophile)</li>
+    <li><strong>Addition Reactions:</strong> Addition of atoms/groups to a double or triple bond (e.g., alkene + H2)</li>
+    <li><strong>Elimination Reactions:</strong> Removal of atoms/groups forming double/triple bonds (e.g., dehydration of alcohols)</li>
+    <li><strong>Oxidation-Reduction:</strong> Change in oxidation state, commonly involving alcohols and aldehydes</li>
+    <li><strong>Polymerization:</strong> Linking of monomers to form polymers (e.g., ethylene to polyethylene)</li>
+  </ul>
+</section>
+
+<section>
+  <h2>4. Spectroscopy Hints</h2>
+  <ul>
+    <li><strong>IR Spectroscopy:</strong> O-H stretch ~3300 cm⁻¹, C=O stretch ~1700 cm⁻¹</li>
+    <li><strong>¹H NMR:</strong> Alkyl protons 0.9-1.5 ppm, Aromatic protons 6-8 ppm</li>
+    <li><strong>¹³C NMR:</strong> Carbonyl carbons 160-220 ppm, Aromatic carbons 110-150 ppm</li>
+    <li><strong>Mass Spectrometry:</strong> Molecular ion peak gives molecular weight</li>
+  </ul>
+</section>
+
+<section>
+  <h2>5. Compound Search Database</h2>
+  <label for="compound-search">Search compound name:</label>
+  <input type="text" id="compound-search" placeholder="e.g. acetone" oninput="searchCompound()" />
+  <button class="mic-btn" onclick="startListening('compound-search')" title="Speak"></button>
+  <div id="compound-info" class="result"></div>
+</section>
+
+<section>
+  <h2>6. Organic Chemistry Quiz</h2>
+  <form id="quiz-form">
+    <div class="quiz-question">
+      <p>1. Which functional group does ethanol contain?</p>
+      <label class="quiz-option"><input type="radio" name="q1" value="Alcohol" /> Alcohol</label><br />
+      <label class="quiz-option"><input type="radio" name="q1" value="Ketone" /> Ketone</label><br />
+      <label class="quiz-option"><input type="radio" name="q1" value="Aldehyde" /> Aldehyde</label>
+    </div>
+
+    <div class="quiz-question">
+      <p>2. What is the IUPAC suffix for ketones?</p>
+      <label class="quiz-option"><input type="radio" name="q2" value="-ol" /> -ol</label><br />
+      <label class="quiz-option"><input type="radio" name="q2" value="-one" /> -one</label><br />
+      <label class="quiz-option"><input type="radio" name="q2" value="-al" /> -al</label>
+    </div>
+
+    <div class="quiz-question">
+      <p>3. Which reaction involves addition of atoms to a double bond?</p>
+      <label class="quiz-option"><input type="radio" name="q3" value="Substitution" /> Substitution</label><br />
+      <label class="quiz-option"><input type="radio" name="q3" value="Addition" /> Addition</label><br />
+      <label class="quiz-option"><input type="radio" name="q3" value="Elimination" /> Elimination</label>
+    </div>
+
+    <div class="quiz-question">
+      <p>4. In IR spectroscopy, around what wavenumber does the carbonyl (C=O) stretch occur?</p>
+      <label class="quiz-option"><input type="radio" name="q4" value="1700 cm⁻¹" /> 1700 cm⁻¹</label><br />
+      <label class="quiz-option"><input type="radio" name="q4" value="3300 cm⁻¹" /> 3300 cm⁻¹</label><br />
+      <label class="quiz-option"><input type="radio" name="q4" value="1100 cm⁻¹" /> 1100 cm⁻¹</label>
+    </div>
+
+    <button type="button" onclick="gradeQuiz()">Submit Quiz</button>
+  </form>
+  <div id="quiz-result" class="quiz-result"></div>
+</section>
+
+<footer>
+  <p>Created by Your Name | Data & Functions © 2025 Organic Chemistry Helper</p>
+</footer>
+
+<script>
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
+  function startListening(inputId) {
+    if (!recognition) {
+      alert("Speech Recognition not supported in this browser.");
+      return;
+    }
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.start();
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      document.getElementById(inputId).value = transcript;
+    };
+  }
+
+  function speak(text) {
+    if ("speechSynthesis" in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      speechSynthesis.speak(utterance);
+    }
+  }
+
+  async function askGemini(inputId, resultId) {
+    const query = document.getElementById(inputId).value.trim();
+    if (!query) return;
+
+    const resultBox = document.getElementById(resultId);
+    resultBox.textContent = "Searching with Gemini...";
+
+    try {
+      const res = await fetch("http://localhost:5000/api/ask-gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      });
+
+      const data = await res.json();
+      resultBox.textContent = data.answer;
+      speak(data.answer);
+    } catch (err) {
+      resultBox.textContent = "Failed to get response from Gemini.";
+      speak("Sorry, I could not retrieve the information.");
+      console.error(err);
+    }
+  }
+
+  function identifyFunctionalGroups() {
+    askGemini("fg-input", "fg-result");
+  }
+
+  function generateIUPAC() {
+    askGemini("iupac-input", "iupac-result");
+  }
+
+  function searchCompound() {
+    askGemini("compound-search", "compound-info");
+  }
+
+  function gradeQuiz() {
+    const correctAnswers = {
+      q1: "Alcohol",
+      q2: "-one",
+      q3: "Addition",
+      q4: "1700 cm⁻¹",
+    };
+
+    let score = 0;
+    for (const [q, ans] of Object.entries(correctAnswers)) {
+      const selected = document.querySelector(`input[name="${q}"]:checked`);
+      if (selected && selected.value === ans) score++;
+    }
+
+    const total = Object.keys(correctAnswers).length;
+    const resultText = `You scored ${score} out of ${total}.`;
+    document.getElementById("quiz-result").textContent = resultText;
+    speak(resultText);
+  }
+</script>
+</body>
+</html>
