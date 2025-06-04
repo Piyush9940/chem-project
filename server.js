@@ -16,9 +16,12 @@ app.use(express.static(path.join(__dirname, "public")));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// Gemini API Route
 app.post("/api/ask-gemini", async (req, res) => {
   const userQuery = req.body.query;
+
+  if (!userQuery || userQuery.trim() === "") {
+    return res.status(400).json({ error: "Query cannot be empty." });
+  }
 
   try {
     const response = await fetch(
@@ -35,19 +38,31 @@ app.post("/api/ask-gemini", async (req, res) => {
     );
 
     const data = await response.json();
-    const answer =
-      data.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Gemini.";
-    res.json({ answer });
+
+    const answer = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (answer) {
+      res.json({ answer });
+    } else {
+      res.json({
+        answer: "No response from Gemini.",
+        debug: data,
+      });
+    }
   } catch (error) {
-    console.error("Gemini API error:", error);
-    res.status(500).json({ error: "Gemini API call failed." });
+    res.status(500).json({
+      error: "Gemini API call failed.",
+      details: error.message,
+    });
   }
 });
 
-// Optional: redirect root to dashboard
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "dashboard.html"));
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
